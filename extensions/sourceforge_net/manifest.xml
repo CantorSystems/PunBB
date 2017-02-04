@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+<extension engine="1.0">
+<id>sourceforge_net</id>
+<title>SourceForge.net hosting issues</title>
+<version>0.1</version>
+<description>Use $_SERVER['HTTP_X_REMOTE_ADDR'] to determine client IP address</description>
+<author>Vladislav Javadov (aka Freeman)</author>
+
+<minversion>1.4</minversion>
+<maxtestedon>1.4.2</maxtestedon>
+
+<hooks>
+<hook id="fn_get_remote_address_start"><![CDATA[
+	return $_SERVER['HTTP_X_REMOTE_ADDR'];
+]]></hook>
+</hooks>
+</extension>

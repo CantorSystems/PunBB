@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+<extension engine="1.0">
+	<id>avatar_resizing</id>
+	<title>Avatar resizing</title>
+	<version>1.0</version>
+	<description>Автоматическое изменение размера аватара при загрузке.</description>
+	<author>fatalenergy</author>
+	<minversion>1.3.4</minversion>
+	<maxtestedon>1.4.4</maxtestedon>
+	
+<hooks>
+<hook id="pf_change_details_avatar_pre_header_load" priority="1">
+			<![CDATA[
+if ($forum_аvatar_resizin == 1)	$forum_page['frm_info']['avatar_resizing'] = '<li><span style="color:red;">'.$lang_аvatar_resizing['resizing'].'</span></li>';	
+			]]>
+</hook>			
+<hook id="pf_change_details_avatar_modify_size" priority="1">
+			<![CDATA[
+//Language files!
+if (file_exists($ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php'))
+	include $ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php';
+else
+	include $ext_info['path'].'/lang/English/'.$ext_info['id'].'.php';
+
+function аvatar_resizin($forum_config, $id)
+{
+	global $forum_аvatar_resizin;
+	list($width, $height, $type) = getimagesize($forum_config['o_avatars_dir'].'/'.$id.'.tmp');
+	if ($width > 0 AND $height > 0 AND ($width > $forum_config['o_avatars_width'] OR $height > $forum_config['o_avatars_height']))
+	{
+                // Attempt to resize if GD is installed with support for the uploaded image type, as well as JPG for the output
+                $check_type = str_replace(array(1, 2, 3), array('IMG_GIF', 'IMG_JPG', 'IMG_PNG'), $type);
+                if (extension_loaded('gd') && imagetypes() & constant($check_type) && imagetypes() & IMG_JPG)
+                {
+                    // Load the image for processing
+                    if ($type == 1) $src_img = @imagecreatefromgif($forum_config['o_avatars_dir'].'/'.$id.'.tmp');
+                    elseif ($type == 2) $src_img = @imagecreatefromjpeg($forum_config['o_avatars_dir'].'/'.$id.'.tmp');
+                    elseif ($type == 3) $src_img = @imagecreatefrompng($forum_config['o_avatars_dir'].'/'.$id.'.tmp');
+
+                    if ($src_img)
+                    {
+                        // Figure out new image dimensions based on the maximum width
+                        $new_w = $forum_config['o_avatars_width'];
+                        $ratio = $height * $new_w;
+                        $new_h = $ratio / $width;
+                        // Do the new dimensions, based on the maximum width, fit the maximum height? If not, recalculate
+                        if ($new_h > $forum_config['o_avatars_height'])
+                        {
+                            $new_h = $forum_config['o_avatars_height'];
+                            $ratio = $width * $new_h;
+                            $new_w = $ratio / $height;
+                        }
+                        // Resize the image
+                        $new_img = imagecreatetruecolor($new_w, $new_h);
+                        imagecopyresampled($new_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, $width, $height);
+                        // Delete the old image and write the newly resized one
+                        @unlink($forum_config['o_avatars_dir'].'/'.$id.'.tmp');
+                        imagejpeg($new_img,$forum_config['o_avatars_dir'].'/'.$id.'.tmp',85);
+                        // Set the extension to JPG, since that's what the resized image is now
+                        $extensions[0] = '.jpg';
+                        $forum_аvatar_resizin = 1;
+                    }
+                }
+  }
+}
+аvatar_resizin($forum_config, $id);
+
+			]]>
+</hook>
+</hooks>
+</extension>

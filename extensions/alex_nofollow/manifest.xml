@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+
+
+<extension engine="1.0">
+	<id>alex_nofollow</id>
+	<title>Alex Nofollow</title>
+	<version>0.1</version>
+	<description>Add rel='nofollow' to external links</description>
+	<author>alexantr</author>
+
+	<minversion>1.4RC1</minversion>
+	<maxtestedon>1.4.2</maxtestedon>
+
+	<hooks>
+
+		<hook id="ps_handle_url_tag_end"><![CDATA[
+			if ($bbcode)
+			{
+				if (defined('FORUM_SUPPORT_PCRE_UNICODE') && defined('FORUM_ENABLE_IDNA'))
+				{
+					if (preg_match('!^(https?|ftp|news){1}'.preg_quote('://xn--', '!').'!', $link))
+					{
+						$link = $idn->decode($link);
+					}
+				}
+
+				if ($full_url == $link)
+					return '[url]'.$link.'[/url]';
+				else
+					return '[url='.$full_url.']'.$link.'[/url]';
+			}
+			else
+			{
+				if (preg_match('!^https?://'.$_SERVER['HTTP_HOST'].'!', $full_url))
+					return '<a href="'.$full_url.'">'.$link.'</a>';
+				else
+					return '<a href="'.$full_url.'" rel="nofollow">'.$link.'</a>';
+			}
+		]]></hook>
+
+		<hook id="vt_row_pre_post_contacts_merge"><![CDATA[
+			if (isset($forum_page['post_contacts']['url']) && !preg_match('!^https?://'.$_SERVER['HTTP_HOST'].'!', $cur_post['url'])) {
+				$forum_page['post_contacts']['url'] = str_replace('a class="external', 'a rel="nofollow" class="external', $forum_page['post_contacts']['url']);
+			}
+		]]></hook>
+
+	</hooks>
+</extension>

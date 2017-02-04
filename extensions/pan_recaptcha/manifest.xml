@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+
+<extension engine="1.0">
+	<id>pan_recaptcha</id>
+	<title>Pan reCAPTCHA</title>
+	<version>0.1</version>
+	<description>(pan_recaptcha) - Protection from bots registration</description>
+	<author>PanBB.Ru, created by idea of Nihi1ist</author>
+
+	<minversion>1.4.2</minversion>
+	<maxtestedon>1.4.4</maxtestedon>
+
+	<install><![CDATA[
+forum_config_add('o_pan_recaptcha_pub_key', '');
+forum_config_add('o_pan_recaptcha_priv_key', '');
+	]]></install>
+	
+	<uninstall><![CDATA[ 
+forum_config_remove(array(
+	'o_pan_recaptcha_pub_key',
+	'o_pan_recaptcha_priv_key',
+));
+	]]></uninstall>
+
+	<hooks>
+
+		<hook id="aop_features_gzip_fieldset_end"><![CDATA[
+require $ext_info['path'].'/hooks/aop_features_gzip_fieldset_end.php';
+		]]></hook>
+
+		<hook id="hd_head"><![CDATA[
+require $ext_info['path'].'/hooks/hd_head.php';
+		]]></hook>
+
+		<hook id="rg_register_form_submitted"><![CDATA[
+require $ext_info['path'].'/hooks/rg_register_form_submitted.php';
+		]]></hook>
+
+		<hook id="rg_register_pre_group_end"><![CDATA[
+require $ext_info['path'].'/hooks/rg_register_pre_group_end.php';
+		]]></hook>
+
+	</hooks>
+</extension>
+
