@@ -291,8 +291,8 @@ if (isset($_GET['tid']))
 
 			if ($new_subject == '')
 				message($lang_post['No subject']);
-			else if (utf8_strlen($new_subject) > 70)
-				message($lang_post['Too long subject']);
+			else if (utf8_strlen($new_subject) > FORUM_SUBJECT_MAXIMUM_LENGTH)
+				message(sprintf($lang_post['Too long subject'], FORUM_SUBJECT_MAXIMUM_LENGTH));
 
 			// Get data from the new first post
 			$query = array(
@@ -381,7 +381,7 @@ if (isset($_GET['tid']))
 <?php ($hook = get_hook('mr_confirm_split_posts_pre_subject')) ? eval($hook) : null; ?>
 					<div class="sf-box text required">
 						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['New subject'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="new_subject" size="70" maxlength="70" required /></span>
+						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="new_subject" size="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" maxlength="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" required /></span>
 					</div>
 <?php ($hook = get_hook('mr_confirm_split_posts_pre_confirm_checkbox')) ? eval($hook) : null; ?>
 					<div class="sf-box checkbox">
@@ -887,6 +887,8 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 	$forum_page['cur_category'] = 0;
 	foreach ($forum_list as $cur_forum)
 	{
+		($hook = get_hook('mr_move_topics_forum_loop_start')) ? eval($hook) : null;
+		
 		if ($cur_forum['cid'] != $forum_page['cur_category'])	// A new category since last iteration?
 		{
 			if ($forum_page['cur_category'])
@@ -898,6 +900,8 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 
 		if ($cur_forum['fid'] != $fid)
 			echo "\t\t\t\t".'<option value="'.$cur_forum['fid'].'">'.forum_htmlencode($cur_forum['forum_name']).'</option>'."\n";
+			
+		($hook = get_hook('mr_move_topics_forum_loop_end')) ? eval($hook) : null;
 	}
 
 ?>
@@ -1064,7 +1068,7 @@ else if (isset($_POST['merge_topics']) || isset($_POST['merge_topics_comply']))
 				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="sf-box checkbox">
 						<span class="fld-input"><input type="checkbox" id="fld<?php echo (++$forum_page['fld_count']) ?>" name="with_redirect" value="1" /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_misc['Redirect topic'] ?></span> <?php echo $lang_misc['Leave merge redirects'] ?></label>
+						<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_misc['Leave merge redirects'] ?></label>
 					</div>
 				</div>
 <?php ($hook = get_hook('mr_merge_topics_pre_fieldset_end')) ? eval($hook) : null; ?>
@@ -1578,7 +1582,7 @@ $forum_page['item_header']['info']['lastpost'] = '<strong class="info-lastpost">
 
 		$forum_page['item_subject']['starter'] = '<span class="item-starter">'.sprintf($lang_forum['Topic starter'], forum_htmlencode($cur_topic['poster'])).'</span>';
 
-		if ($cur_topic['moved_to'] != null)
+		if ($cur_topic['moved_to'] !== null)
 		{
 			$forum_page['item_status']['moved'] = 'moved';
 			$forum_page['item_title']['link'] = '<span class="item-status"><em class="moved">'.sprintf($lang_forum['Item status'], $lang_forum['Moved']).'</em></span> <a href="'.forum_link($forum_url['topic'], array($cur_topic['moved_to'], sef_friendly($cur_topic['subject']))).'">'.forum_htmlencode($cur_topic['subject']).'</a>';

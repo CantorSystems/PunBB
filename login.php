@@ -243,6 +243,9 @@ else if ($action == 'forget' || $action == 'forget_2')
 
 					($hook = get_hook('li_forgot_pass_pre_flood_check')) ? eval($hook) : null;
 
+					if ($cur_hit['group_id'] == FORUM_ADMIN)
+						message(sprintf($lang_login['Email important'], '<a href="mailto:'.forum_htmlencode($forum_config['o_admin_email']).'">'.forum_htmlencode($forum_config['o_admin_email']).'</a>'));
+
 					if ($cur_hit['last_email_sent'] != '' && (time() - $cur_hit['last_email_sent']) < $forgot_pass_timeout && (time() - $cur_hit['last_email_sent']) >= 0)
 						message(sprintf($lang_login['Email flood'], $forgot_pass_timeout));
 

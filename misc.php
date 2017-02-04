@@ -152,6 +152,37 @@ else if ($action == 'markforumread')
 	redirect(forum_link($forum_url['forum'], array($fid, sef_friendly($forum_name))), $lang_misc['Mark forum read redirect']);
 }
 
+// OpenSearch plugin?
+else if ($action == 'opensearch')
+{
+	// Send XML/no cache headers
+	header('Content-Type: text/xml; charset=utf-8');
+	header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Pragma: public');
+
+	echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
+	echo '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">'."\n";
+	echo "\t".'<ShortName>'.forum_htmlencode($forum_config['o_board_title']).'</ShortName>'."\n";
+	echo "\t".'<Description>'.forum_htmlencode($forum_config['o_board_desc']).'</Description>'."\n";
+	echo "\t".'<InputEncoding>utf-8</InputEncoding>'."\n";
+	echo "\t".'<OutputEncoding>utf-8</OutputEncoding>'."\n";
+	echo "\t".'<Image width="16" height="16" type="image/x-icon">'.global_link('/favicon.ico').'</Image>'."\n";
+	echo "\t".'<Url type="text/html" method="get" template="'.global_link($base_url).'/search.php?action=search&amp;source=opensearch&amp;keywords={searchTerms}"/>'."\n";
+	echo "\t".'<Url type="application/opensearchdescription+xml" rel="self" template="'.global_link(forum_link($forum_url['opensearch'])).'"/>'."\n";
+	echo "\t".'<Contact>'.forum_htmlencode($forum_config['o_admin_email']).'</Contact>'."\n";
+
+	if ($forum_config['o_show_version'] == '1')
+		echo "\t".'<Attribution>PunBB '.$forum_config['o_cur_version'].'</Attribution>'."\n";
+	else
+		echo "\t".'<Attribution>PunBB</Attribution>'."\n";
+
+	echo "\t".'<moz:SearchForm>'.global_link(forum_link($forum_url['search'])).'</moz:SearchForm>'."\n";
+	echo '</OpenSearchDescription>'."\n";
+
+	exit;
+}
+
 
 // Send form e-mail?
 else if (isset($_GET['email']))
@@ -202,10 +233,15 @@ else if (isset($_GET['email']))
 
 		if ($subject == '')
 			$errors[] = $lang_misc['No e-mail subject'];
+		else if (utf8_strlen($subject) > FORUM_SUBJECT_MAXIMUM_LENGTH)
+	     	$errors[] = sprintf($lang_misc['Too long e-mail subject'], FORUM_SUBJECT_MAXIMUM_LENGTH);
+
 		if ($message == '')
 			$errors[] = $lang_misc['No e-mail message'];
 		else if (strlen($message) > FORUM_MAX_POSTSIZE_BYTES)
-			$errors[] = sprintf($lang_misc['Too long e-mail message'], forum_number_format(strlen($message)), forum_number_format(FORUM_MAX_POSTSIZE_BYTES));
+			$errors[] = sprintf($lang_misc['Too long e-mail message'],
+				forum_number_format(strlen($message)), forum_number_format(FORUM_MAX_POSTSIZE_BYTES));
+
 		if ($forum_user['last_email_sent'] != '' && (time() - $forum_user['last_email_sent']) < $forum_user['g_email_flood'] && (time() - $forum_user['last_email_sent']) >= 0)
 			$errors[] = sprintf($lang_misc['Email flood'], $forum_user['g_email_flood']);
 
@@ -327,7 +363,7 @@ else if (isset($_GET['email']))
 				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="sf-box text required longtext">
 						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['E-mail subject'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_subject" value="<?php echo(isset($_POST['req_subject']) ? forum_htmlencode($_POST['req_subject']) : '') ?>" size="75" maxlength="70" required /></span>
+						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_subject" value="<?php echo(isset($_POST['req_subject']) ? forum_htmlencode($_POST['req_subject']) : '') ?>" size="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" maxlength="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" required /></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('mi_email_pre_message_contents')) ? eval($hook) : null; ?>

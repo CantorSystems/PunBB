@@ -59,8 +59,22 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 	$ext_data = xml_to_array($manifest);
 	$errors = validate_manifest($ext_data, $id);
 
-	if (!empty($errors))
-		message(isset($_GET['install']) ? $lang_common['Bad request'] : $lang_admin_ext['Hotfix download failed']);
+	/*
+	 * Errors must be fully specified instead "bad request" message only
+	 */
+	if (!empty($errors)) {
+		foreach ($errors as $i => $cur_error) {
+			$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
+		}
+		$msg_errors =
+			'<div class="ct-box error-box"><h2 class="warn hn">'
+				. $lang_admin_ext['Install ext errors']
+				. '<ul class="error-list">'
+					. implode("\n", $errors)
+				. '</ul>'
+			. '</div>';
+		message(isset($_GET['install'])? $msg_errors : $lang_admin_ext['Hotfix download failed']);
+	}
 
 	// Get core amd major versions
 	if (!defined('FORUM_DISABLE_EXTENSIONS_VERSION_CHECK'))
@@ -81,7 +95,7 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 		$ext_data['extension']['dependencies'] = $ext_data['extension']['dependencies']['dependency'];
 
 	$query = array(
-		'SELECT'	=> 'e.id',
+		'SELECT'	=> 'e.id, e.version',
 		'FROM'		=> 'extensions AS e',
 		'WHERE'		=> 'e.disabled=0'
 	);
@@ -91,12 +105,21 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 
 	$installed_ext = array();
 	while ($row = $forum_db->fetch_assoc($result))
-		$installed_ext[] = $row['id'];
+		$installed_ext[$row['id']] = $row;
 
 	foreach ($ext_data['extension']['dependencies'] as $dependency)
 	{
-		if (!in_array($dependency, $installed_ext))
-			message(sprintf($lang_admin_ext['Missing dependency'], $dependency));
+
+		$ext_dependancy_id = is_array($dependency) ? $dependency['content'] : $dependency;
+
+	    if (!array_key_exists($ext_dependancy_id, $installed_ext))
+	    {
+		   $errors[] = sprintf($lang_admin_ext['Missing dependency'], $ext_dependancy_id);
+	}
+	    else if (is_array($dependency) AND isset($dependency['attributes']['minversion']) AND version_compare($dependency['attributes']['minversion'], $installed_ext[$ext_dependancy_id]['version']) > 0)
+	    {
+	    	$errors[] = sprintf($lang_admin_ext['Version dependency error'], $dependency['content'], $dependency['attributes']['minversion']);
+	    }
 	}
 
 	// Setup breadcrumbs
@@ -108,7 +131,7 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 		(strpos($id, 'hotfix_') === 0) ? $lang_admin_ext['Install hotfix'] : $lang_admin_ext['Install extension']
 	);
 
-	if (isset($_POST['install_comply']))
+	if (isset($_POST['install_comply']) AND empty($errors))
 	{
 		($hook = get_hook('aex_install_comply_form_submitted')) ? eval($hook) : null;
 
@@ -310,6 +333,27 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 		<h2 class="hn"><span><?php echo end($forum_page['crumbs']) ?> "<?php echo forum_htmlencode($ext_data['extension']['title']) ?>"</span></h2>
 	</div>
 	<div class="main-content main-frm">
+<?php
+
+    // If there were any errors, show them
+    if (!empty($errors))
+    {
+        $forum_page['errors'] = array();
+        foreach ($errors as $cur_error)
+            $forum_page['errors'][] = '<li class="warn"><span>'.$cur_error.'</span></li>';
+
+            ($hook = get_hook('aex_install_ext_pre_errors')) ? eval($hook) : null;
+
+?>
+		<div class="ct-box error-box">
+			<h2 class="warn hn"><?php echo $lang_admin_ext['Install ext errors'] ?></h2>
+			<ul class="error-list">
+				<?php echo implode("\n\t\t\t\t", $forum_page['errors'])."\n" ?>
+			</ul>
+		</div>
+<?php
+    }
+?>
 		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $base_url.'/admin/extensions.php'.(isset($_GET['install']) ? '?install=' : '?install_hotfix=').$id ?>">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token($base_url.'/admin/extensions.php'.(isset($_GET['install']) ? '?install=' : '?install_hotfix=').$id) ?>" />
@@ -860,7 +904,7 @@ else
 	if ($forum_config['o_check_for_versions'] == 1)
 	{
 		// Check for the new versions of the extensions istalled
-		$repository_urls = array('http://punbb.informer.com/extensions/1.4');
+		$repository_urls = array(FORUM_PUN_EXTENSION_REPOSITORY_URL);
 		($hook = get_hook('aex_add_extensions_repository')) ? eval($hook) : null;
 
 		$repository_url_by_extension = array();
@@ -881,7 +925,7 @@ else
 		$update_hour = (isset($forum_ext_versions_update_cache) && (time() - $forum_ext_versions_update_cache > 60 * 60));
 
 		// Update last versions if there is no cahe or some extension was added/removed or one day has gone since last update
-		$update_new_versions_cache = !defined('FORUM_EXT_VERSIONS_LOADED') || (isset($forum_ext_last_versions) && array_diff($inst_exts, $forum_ext_last_versions) != array()) || $update_hour || ($update_hour && isset($min_timestamp) && (time() - $min_timestamp > 60*60*24));
+		$update_new_versions_cache = !defined('FORUM_EXT_VERSIONS_LOADED') || (isset($forum_ext_last_versions) && array_diff(array_keys($inst_exts), array_keys($forum_ext_last_versions)) != array()) || $update_hour || ($update_hour && isset($min_timestamp) && (time() - $min_timestamp > 60*60*24));
 
 		($hook = get_hook('aex_before_update_checking')) ? eval($hook) : null;
 
@@ -958,7 +1002,17 @@ else
 			$errors = validate_manifest($ext_data, $entry);
 			if (!empty($errors))
 			{
-				$forum_page['ext_error'][] = '<div class="ext-error databox db'.++$forum_page['item_num'].'">'."\n\t\t\t\t".'<h3 class="legend"><span>'.sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)).'</span></h3>'."\n\t\t\t\t".'<p>'.implode(' ', $errors).'</p>'."\n\t\t\t".'</div>';
+				foreach ($errors as $i => $cur_error) {
+					$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
+				}
+				$forum_page['ext_error'][] =
+					'<div class="ext-error databox db' . ++$forum_page['item_num'] . '">'
+						. "\n\t\t\t\t"
+						. '<h3 class="legend"><span>' . sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)) . '</span></h3>'
+						. "\n\t\t\t\t"
+						. '<p><ul class="error-list">' . implode(' ', $errors) . '</ul></p>'
+						. "\n\t\t\t"
+					. '</div>';
 				++$num_failed;
 			}
 			else

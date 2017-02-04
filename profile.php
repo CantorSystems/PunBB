@@ -975,6 +975,21 @@ else if (isset($_POST['form_sent']))
 			if ($form['url'] != '' && strpos(strtolower($form['url']), 'http://') !== 0 && strpos(strtolower($form['url']), 'https://') !== 0)
 				$form['url'] = 'http://'.$form['url'];
 
+			//check Facebook for validity
+			if (strpos($form['facebook'], 'http://') === 0 || strpos($form['facebook'], 'https://') === 0)
+				if (!preg_match('#https?://(www\.)?facebook.com/.+?#', $form['facebook']))
+					$errors[] = $lang_profile['Bad Facebook'];
+
+			//check Twitter for validity
+			if (strpos($form['twitter'], 'http://') === 0 || strpos($form['twitter'], 'https://') === 0)
+				if (!preg_match('#https?://twitter.com/.+?#', $form['twitter']))
+					$errors[] = $lang_profile['Bad Twitter'];
+
+			//check LinkedIn for validity
+			if (strpos($form['linkedin'], 'http://') === 0 || strpos($form['linkedin'], 'https://') === 0)
+				if (!preg_match('#https?://(www\.)?linkedin.com/.+?#', $form['linkedin']))
+					$errors[] = $lang_profile['Bad LinkedIn'];
+
 			// Add http:// if the LinkedIn doesn't contain it or https:// already
 			if ($form['linkedin'] != '' && strpos(strtolower($form['linkedin']), 'http://') !== 0 && strpos(strtolower($form['linkedin']), 'https://') !== 0)
 				$form['linkedin'] = 'http://'.$form['linkedin'];
@@ -1474,7 +1489,7 @@ if ($forum_user['id'] != $id &&
 			forum_htmlencode($user['facebook']) :
 			forum_htmlencode('https://www.facebook.com/'.$user['facebook'])
 		;
-		$forum_page['facebook'] = '<a href="'.$facebook_url.'" class="external url">'.$user['facebook'].'</a>';
+		$forum_page['facebook'] = '<a href="'.$facebook_url.'" class="external url">'.$facebook_url.'</a>';
 		$forum_page['user_contact']['facebook'] = '<li><span>'.$lang_profile['Facebook'].': '.$forum_page['facebook'].'</span></li>';
 	}
 
@@ -1490,7 +1505,7 @@ if ($forum_user['id'] != $id &&
 			forum_htmlencode($user['twitter']) :
 			forum_htmlencode('https://twitter.com/'.$user['twitter'])
 		;
-		$forum_page['twitter'] = '<a href="'.$twitter_url.'" class="external url">'.$user['twitter'].'</a>';
+		$forum_page['twitter'] = '<a href="'.$twitter_url.'" class="external url">'.$twitter_url.'</a>';
 		$forum_page['user_contact']['twitter'] = '<li><span>'.$lang_profile['Twitter'].': '.$forum_page['twitter'].'</span></li>';
 	}
 
@@ -1749,7 +1764,7 @@ else
 				forum_htmlencode($user['facebook']) :
 				forum_htmlencode('https://www.facebook.com/'.$user['facebook'])
 			;
-			$forum_page['facebook'] = '<a href="'.$facebook_url.'" class="external url">'.$user['facebook'].'</a>';
+			$forum_page['facebook'] = '<a href="'.$facebook_url.'" class="external url">'.$facebook_url.'</a>';
 			$forum_page['user_contact']['facebook'] = '<li><span>'.$lang_profile['Facebook'].': '.$forum_page['facebook'].'</span></li>';
 		}
 
@@ -1765,7 +1780,7 @@ else
 				forum_htmlencode($user['twitter']) :
 				forum_htmlencode('https://twitter.com/'.$user['twitter'])
 			;
-			$forum_page['twitter'] = '<a href="'.$twitter_url.'" class="external url">'.$user['twitter'].'</a>';
+			$forum_page['twitter'] = '<a href="'.$twitter_url.'" class="external url">'.$twitter_url.'</a>';
 			$forum_page['user_contact']['twitter'] = '<li><span>'.$lang_profile['Twitter'].': '.$forum_page['twitter'].'</span></li>';
 		}
 
@@ -2083,7 +2098,9 @@ if ($forum_page['has_required']): ?>
 						<span class="fld-input"><input type="url" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[linkedin]" value="<?php echo(isset($form['linkedin']) ? forum_htmlencode($form['linkedin']) : forum_htmlencode($user['linkedin'])) ?>" size="35" maxlength="80" /></span>
 					</div>
 				</div>
+<?php ($hook = get_hook('pf_change_details_identity_pre_contact_fieldset_end')) ? eval($hook) : null; ?>				
 			</fieldset>
+<?php ($hook = get_hook('pf_change_details_identity_contact_fieldset_end')) ? eval($hook) : null; ?>			
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_profile['Contact messengers legend'] ?></strong></legend>
 <?php ($hook = get_hook('pf_change_details_identity_pre_jabber')) ? eval($hook) : null; ?>
@@ -2128,9 +2145,9 @@ if ($forum_page['has_required']): ?>
 						<span class="fld-input"><input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[yahoo]" value="<?php echo(isset($form['yahoo']) ? forum_htmlencode($form['yahoo']) : forum_htmlencode($user['yahoo'])) ?>" size="20" maxlength="30" /></span>
 					</div>
 				</div>
-<?php ($hook = get_hook('pf_change_details_identity_pre_contact_fieldset_end')) ? eval($hook) : null; ?>
+<?php ($hook = get_hook('pf_change_details_identity_pre_messengers_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
-<?php ($hook = get_hook('pf_change_details_identity_contact_fieldset_end')) ? eval($hook) : null; ?>
+<?php ($hook = get_hook('pf_change_details_identity_messengers_fieldset_end')) ? eval($hook) : null; ?>
 			<div class="frm-buttons">
 				<span class="submit primary"><input type="submit" name="update" value="<?php echo $lang_profile['Update profile'] ?>" /></span>
 			</div>
@@ -2896,19 +2913,22 @@ if ($forum_page['has_required']): ?>
 				if ($cur_forum['cid'] != $cur_category)	// A new category since last iteration?
 				{
 					if ($cur_category)
-						echo "\n\t\t\t\t\t".'</fieldset>'."\n";
+						 echo "\n\t\t\t\t\t\t".'</fieldset>'."\n";
 
-					echo "\t\t\t\t\t".'<fieldset>'."\n\t\t\t\t\t\t".'<legend><span>'.$cur_forum['cat_name'].':</span></legend>'."\n";
+					echo "\t\t\t\t\t\t".'<fieldset>'."\n\t\t\t\t\t\t\t".'<legend><span>'.$cur_forum['cat_name'].':</span></legend>'."\n";
 					$cur_category = $cur_forum['cid'];
 				}
 
 				$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
 
-				echo "\t\t\t\t\t\t".'<div class="checklist-item"><span class="fld-input"><input type="checkbox" id="fld'.(++$forum_page['fld_count']).'" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' /></span> <label for="fld'.$forum_page['fld_count'].'">'.forum_htmlencode($cur_forum['forum_name']).'</label></div>'."\n";
+				echo "\t\t\t\t\t\t\t".'<div class="checklist-item"><span class="fld-input"><input type="checkbox" id="fld'.(++$forum_page['fld_count']).'" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' /></span> <label for="fld'.$forum_page['fld_count'].'">'.forum_htmlencode($cur_forum['forum_name']).'</label></div>'."\n";
+				
+				($hook = get_hook('pf_change_details_admin_forum_loop_end')) ? eval($hook) : null;
 			}
 
+			if ($cur_category)
+				echo "\t\t\t\t\t\t".'</fieldset>'."\n";
 ?>
-						</fieldset>
 					</div>
 				</div>
 <?php ($hook = get_hook('pf_change_details_admin_pre_mod_assignment_fieldset_end')) ? eval($hook) : null; ?>

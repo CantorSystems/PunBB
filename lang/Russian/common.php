@@ -173,6 +173,6 @@ $lang_common = array(
 'Forum error db query'		=> 'Ошибочный запрос:',
 
 // Menu
-'Menu admin'				=> 'Admin Menu', // TODO
-'Menu profile'				=> 'Profile Menu', // TODO
+'Menu admin'				=> 'Admin Menu',
+'Menu profile'				=> 'Profile Menu',
 );

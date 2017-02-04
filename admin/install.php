@@ -10,17 +10,12 @@
  */
 
 
-define('FORUM_VERSION', '1.4.2');
-define('FORUM_DB_REVISION', 5);
 define('MIN_PHP_VERSION', '5.0.0');
 define('MIN_MYSQL_VERSION', '4.1.2');
 
 define('FORUM_ROOT', '../');
 define('FORUM', 1);
 define('FORUM_DEBUG', 1);
-
-define('FORUM_SEARCH_MIN_WORD', 3);
-define('FORUM_SEARCH_MAX_WORD', 20);
 
 if (file_exists(FORUM_ROOT.'config.php'))
 	exit('The file \'config.php\' already exists which would mean that PunBB is already installed. You should go <a href="'.FORUM_ROOT.'index.php">here</a> instead.');
@@ -36,6 +31,7 @@ error_reporting(E_ALL);
 // Turn off PHP time limit
 @set_time_limit(0);
 
+require FORUM_ROOT.'include/constants.php';
 // We need some stuff from functions.php
 require FORUM_ROOT.'include/functions.php';
 
@@ -489,7 +485,17 @@ else
 
 			if (!$row || !isset($row['Value']) || strtolower($row['Value']) != 'yes')
 			{
-				error($lang_install['MySQL InnoDB Not Supported']);
+				// check InnoDB support for new mysql versions
+				$result = $forum_db->query("SHOW ENGINES");
+				$found_innodb = false;
+				while ($row = $forum_db->fetch_assoc($result)) {
+					if ($row["Engine"] == "InnoDB") {
+						$found_innodb = true;
+					}
+				}
+				if (!$found_innodb) {
+					error($lang_install['MySQL InnoDB Not Supported']);
+				}
 			}
 		}
 	}

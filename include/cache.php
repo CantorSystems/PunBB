@@ -48,6 +48,11 @@ function write_cache_file($file, $content)
 	flock($handle, LOCK_UN);
 	fclose($handle);
 
+	// Force opcache to recompile this script
+	if (function_exists('opcache_invalidate')) {
+		opcache_invalidate($file, true);
+	}
+
 	return true;
 }
 
@@ -60,7 +65,7 @@ function generate_config_cache()
 	global $forum_db;
 
 	$return = ($hook = get_hook('ch_fn_generate_config_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get the forum config from the DB
@@ -92,7 +97,7 @@ function generate_bans_cache()
 	global $forum_db;
 
 	$return = ($hook = get_hook('ch_fn_generate_bans_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get the ban list from the DB
@@ -131,7 +136,7 @@ function generate_ranks_cache()
 	global $forum_db;
 
 	$return = ($hook = get_hook('ch_fn_generate_ranks_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get the rank list from the DB
@@ -166,7 +171,7 @@ function generate_stats_cache()
 	$stats = array();
 
 	$return = ($hook = get_hook('ch_fn_generate_stats_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Collect some statistics from the database
@@ -240,7 +245,7 @@ function generate_censors_cache()
 	global $forum_db;
 
 	$return = ($hook = get_hook('ch_fn_generate_censors_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get the censor list from the DB
@@ -273,7 +278,7 @@ function generate_quickjump_cache($group_id = false)
 	global $forum_db, $lang_common, $forum_url, $forum_config, $forum_user, $base_url;
 
 	$return = ($hook = get_hook('ch_fn_generate_quickjump_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	$groups = array();
@@ -351,6 +356,8 @@ function generate_quickjump_cache($group_id = false)
 			$redirect_tag = ($cur_forum['redirect_url'] != '') ? ' &gt;&gt;&gt;' : '';
 			$output .= "\t\t\t\t".'<option value="'.$cur_forum['fid'].'"<?php echo ($forum_id == '.$cur_forum['fid'].') ? \' selected="selected"\' : \'\' ?>>'.forum_htmlencode($cur_forum['forum_name']).$redirect_tag.'</option>'."\n";
 			$forum_count++;
+			
+			($hook = get_hook('ch_fn_generate_quickjump_cache_forum_loop_end')) ? eval($hook) : null;
 		}
 
 		$output .= "\t\t\t".'</optgroup>'."\n\t\t".'</select>'."\n\t\t".'<input type="submit" id="qjump-submit" value="<?php echo $lang_common[\'Go\'] ?>" /></span>'."\n\t".'</div>'."\n".'</form>'."\n";
@@ -384,7 +391,7 @@ function clean_quickjump_cache($group_id = false)
 	global $forum_db;
 
 	$return = ($hook = get_hook('ch_fn_clean_quickjump_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	$groups = array();
@@ -431,7 +438,7 @@ function generate_hooks_cache()
 	global $forum_db, $forum_config, $base_url;
 
 	$return = ($hook = get_hook('ch_fn_generate_hooks_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get the hooks from the DB
@@ -495,7 +502,7 @@ function generate_updates_cache()
 	global $forum_db, $forum_config;
 
 	$return = ($hook = get_hook('ch_fn_generate_updates_cache_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	// Get a list of installed hotfix extensions
@@ -566,6 +573,11 @@ function generate_ext_versions_cache($inst_exts, $repository_urls, $repository_u
 		{
 			foreach ($inst_exts as $ext)
 			{
+			    
+			    if ((0 === strpos($ext['id'], 'pun_') AND FORUM_PUN_EXTENSION_REPOSITORY_URL != $url) OR
+			            ((FALSE === strpos($ext['id'], 'pun_') AND !isset($ext['repo_url'])) OR (isset($ext['repo_url']) AND $ext['repo_url'] != $url)))
+			        continue;
+			    			    
 				$remote_file = get_remote_file($url.'/'.$ext['id'].'/lastversion', 2);
 				$version = empty($remote_file['content']) ? '' : forum_trim($remote_file['content']);
 				unset($remote_file);

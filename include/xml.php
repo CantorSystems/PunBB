@@ -141,7 +141,7 @@ function validate_manifest($xml_array, $folder_name)
 	$errors = array();
 
 	$return = ($hook = get_hook('xm_fn_validate_manifest_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return;
 
 	if (!isset($xml_array['extension']) || !is_array($xml_array['extension']))
@@ -204,6 +204,28 @@ function validate_manifest($xml_array, $folder_name)
 					$last_element = array_pop($tokenized_hook);
 					if (is_array($last_element) && $last_element[0] == T_INLINE_HTML)
 						$errors[] = $lang_admin_ext['extension/hooks/hook error4'];
+				}
+			}
+		}
+
+		if (isset($ext['minphpversion'])) {
+			if (version_compare(PHP_VERSION, $ext['minphpversion'], "<")) {
+				$errors[] = $lang_admin_ext['The minimum required version of PHP'] . $ext['minphpversion'];
+			}
+		}
+		if (isset($ext['maxphpversion'])) {
+			if (version_compare(PHP_VERSION, $ext['maxphpversion'], ">")) {
+				$errors[] = $lang_admin_ext['The maximum required version of PHP'] . $ext['maxphpversion'];
+			}
+		}
+		if (isset($ext['phpextensions'])) {
+			$installed_phpextensions = array_flip(get_loaded_extensions());
+			foreach (explode(",", $ext['phpextensions']) as $v) {
+				$v = trim($v);
+				if ($v != "") {
+					if (!isset($installed_phpextensions[$v])) {
+						$errors[] = $lang_admin_ext['PHP extension is required'] . $v;
+					}
 				}
 			}
 		}

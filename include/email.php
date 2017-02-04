@@ -19,7 +19,7 @@ if (!defined('FORUM'))
 function is_valid_email($email)
 {
 	$return = ($hook = get_hook('em_fn_is_valid_email_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return $return;
 
 	if (strlen($email) > 80)
@@ -37,7 +37,7 @@ function is_banned_email($email)
 	global $forum_db, $forum_bans;
 
 	$return = ($hook = get_hook('em_fn_is_banned_email_start')) ? eval($hook) : null;
-	if ($return != null)
+	if ($return !== null)
 		return $return;
 
 	foreach ($forum_bans as $cur_ban)
@@ -148,7 +148,6 @@ function smtp_mail($to, $subject, $message, $headers = '')
 		$smtp_port = 25;
 	}
 
-    $ehlo_host = $smtp_host;
 	if ($forum_config['o_smtp_ssl'] == '1')
 		$smtp_host = 'ssl://'.$smtp_host;
 
@@ -159,7 +158,7 @@ function smtp_mail($to, $subject, $message, $headers = '')
 
 	if ($forum_config['o_smtp_user'] != '' && $forum_config['o_smtp_pass'] != '')
 	{
-		fwrite($socket, 'EHLO '.$ehlo_host."\r\n");
+		fwrite($socket, 'EHLO '.$smtp_host."\r\n");
 		server_parse($socket, '250');
 
 		fwrite($socket, 'AUTH LOGIN'."\r\n");

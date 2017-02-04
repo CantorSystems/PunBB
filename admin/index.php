@@ -193,7 +193,7 @@ ob_start();
 					<h3 class="ct-legend hn"><span><?php echo $lang_admin_index['PunBB community'] ?></span></h3>
 					<ul class="data-list">
 						<li><span><?php echo $lang_admin_index['Forums'] ?>: <a href="http://punbb.informer.com/forums/">Forums</a></span></li>
-						<li><span><?php echo $lang_admin_index['Twitter'] ?>: <a href="https://twitter.com/punbb_forum">punbb_forum</a></span></li>
+						<li><span><?php echo $lang_admin_index['Twitter'] ?>: <a href="https://twitter.com/punbb_forum">@punbb_forum</a></span></li>
 						<li><span><?php echo $lang_admin_index['Development'] ?>: <a href="https://github.com/punbb/punbb">https://github.com/punbb</a></span></li>
 					</ul>
 				</div>

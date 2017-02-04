@@ -1,4 +1,4 @@
-Subject: New topic in forum: ‘<forum_name>’
+Subject: New topic in forum ‘<forum_name>’
 
 <topic_starter> has created new topic ‘<topic_subject>’ in forum to which you are subscribed.
 
