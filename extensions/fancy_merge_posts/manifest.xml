@@ -4,12 +4,12 @@
 <extension engine="1.0">
 	<id>fancy_merge_posts</id>
 	<title>Fancy Merge Posts</title>
-	<version>0.6.3</version>
+	<version>0.6.4</version>
 	<description>Automaticaly merge posts from one author</description>
 	<author>dimka.linux@gmail.com</author>
 
 	<minversion>1.4RC1</minversion>
-	<maxtestedon>1.4.2</maxtestedon>
+	<maxtestedon>1.4.4</maxtestedon>
 
 
 
@@ -295,7 +295,7 @@
 
 		<hook id="ps_do_bbcode_replace"><![CDATA[
 			$pattern[] = '#\[merge_posts_bbcode\](.*?)\[/merge_posts_bbcode\]#s';
-			$replace[] = '</p><p class="lastedit merged"><em>$1</em></p><p>';
+			$replace[] = '</p><p class=\'lastedit merged\'><em>$matches[1]</em></p><p>';
 		]]></hook>
 
 
