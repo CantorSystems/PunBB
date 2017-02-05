@@ -83,7 +83,7 @@ $forum_url = array(
 	'stick'							=>	'moderate.php?fid=$1&amp;stick=$2&amp;csrf_token=$3',
 	'unstick'						=>	'moderate.php?fid=$1&amp;unstick=$2&amp;csrf_token=$3',
 	'moderate_topic'				=>	'moderate.php?fid=$1&amp;tid=$2',
-	'admin_index'					=>	'admin/index.php',
+	'admin_index'					=>	'admin/',
 	'admin_bans'					=>	'admin/bans.php?sort_by=1',
 	'admin_categories'				=>	'admin/categories.php',
 	'admin_censoring'				=>	'admin/censoring.php',
