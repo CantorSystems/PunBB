@@ -445,12 +445,12 @@ if ($action == 'feed')
 
 		// Fetch $show topics
 		$query = array(
-			'SELECT'	=> 't.id, t.poster, t.posted, t.subject, p.message, p.hide_smilies, u.email_setting, u.email, p.poster_id, p.poster_email',
+			'SELECT'	=> 't.id, t.poster, t.subject, p.posted, p.message, p.hide_smilies, u.email_setting, u.email, p.poster_id, p.poster_email',
 			'FROM'		=> 'topics AS t',
 			'JOINS'		=> array(
 				array(
 					'INNER JOIN'	=> 'posts AS p',
-					'ON'			=> 'p.id = t.first_post_id'
+					'ON'			=> 'p.id = '.(($sort_by == 'last_post') ? 't.last_post_id' : 't.first_post_id')
 				),
 				array(
 					'INNER JOIN'	=> 'users AS u',
