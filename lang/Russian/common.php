@@ -8,8 +8,8 @@ $lang_common = array(
 'lang_identifier'			=> 'ru',
 
 // Number formatting
-'lang_decimal_point'        => '.',
-'lang_thousands_sep'        => ',',
+'lang_decimal_point'        => ',',
+'lang_thousands_sep'        => ' ',
 
 // Notices
 'Bad request'				=> 'Неверный запрос. Ссылка, по которой вы пришли, неверна или устарела.',
