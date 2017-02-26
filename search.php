@@ -32,7 +32,7 @@ if (isset($_GET['search_id']))
 {
 	$search_id = intval($_GET['search_id']);
 	if ($search_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// Generate the query to grab the cached results
 	$query = generate_cached_search_query($search_id, $show_as);
@@ -46,7 +46,7 @@ else if (isset($_GET['action']))
 
 	// Validate action
 	if (!validate_search_action($action))
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// If it's a regular search (keywords and/or author)
 	if ($action == 'search')
@@ -80,7 +80,7 @@ else if (isset($_GET['action']))
 		{
 			$value = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 			if ($value < 2)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 		}
 		else if ($action == 'show_recent')
 			$value = (isset($_GET['value'])) ? intval($_GET['value']) : 86400;

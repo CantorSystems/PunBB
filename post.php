@@ -25,7 +25,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/post.php';
 $tid = isset($_GET['tid']) ? intval($_GET['tid']) : 0;
 $fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 if ($tid < 1 && $fid < 1 || $tid > 0 && $fid > 0)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 // Fetch some info about the topic and/or the forum
@@ -74,13 +74,13 @@ $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 $cur_posting = $forum_db->fetch_assoc($result);
 
 if (!$cur_posting)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 $is_subscribed = $tid && $cur_posting['is_subscribed'];
 
 // Is someone trying to post into a redirect forum?
 if ($cur_posting['redirect_url'] != '')
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 // Sort out who the moderators are and if we are currently a moderator (or an admin)
 $mods_array = ($cur_posting['moderators'] != '') ? unserialize($cur_posting['moderators']) : array();
@@ -108,7 +108,7 @@ if (isset($_POST['form_sent']))
 
 	// Make sure form_user is correct
 	if (($forum_user['is_guest'] && $_POST['form_user'] != 'Guest') || (!$forum_user['is_guest'] && $_POST['form_user'] != $forum_user['username']))
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// Flood protection
 	if (!isset($_POST['preview']) && $forum_user['last_post'] != '' && (time() - $forum_user['last_post']) < $forum_user['g_post_flood'] && (time() - $forum_user['last_post']) >= 0)
@@ -249,7 +249,7 @@ if ($tid && isset($_GET['qid']))
 {
 	$qid = intval($_GET['qid']);
 	if ($qid < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// Get the quote and quote poster
 	$query = array(
@@ -264,7 +264,7 @@ if ($tid && isset($_GET['qid']))
 
 	if (!$quote_info)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	($hook = get_hook('po_modify_quote_info')) ? eval($hook) : null;

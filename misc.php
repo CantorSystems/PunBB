@@ -28,7 +28,7 @@ $errors = array();
 if ($action == 'rules')
 {
 	if ($forum_config['o_rules'] == '0' || ($forum_user['is_guest'] && $forum_user['g_read_board'] == '0' && $forum_config['o_regs_allow'] == '0'))
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
@@ -110,7 +110,7 @@ else if ($action == 'markforumread')
 
 	$fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 	if ($fid < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.
@@ -138,7 +138,7 @@ else if ($action == 'markforumread')
 
 	if (!$forum_name)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	$tracked_topics = get_tracked_topics();
@@ -193,7 +193,7 @@ else if (isset($_GET['email']))
 	$recipient_id = intval($_GET['email']);
 
 	if ($recipient_id < 2)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	($hook = get_hook('mi_email_selected')) ? eval($hook) : null;
 
@@ -214,14 +214,14 @@ else if (isset($_GET['email']))
 
 	if (!$recipient_info)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	if ($recipient_info['email_setting'] == 2 && !$forum_user['is_admmod'])
 		message($lang_misc['Form e-mail disabled']);
 
 	if ($recipient_info['email'] == '')
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	if (isset($_POST['form_sent']))
 	{
@@ -403,7 +403,7 @@ else if (isset($_GET['report']))
 
 	$post_id = intval($_GET['report']);
 	if ($post_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 
 	($hook = get_hook('mi_report_selected')) ? eval($hook) : null;
@@ -454,7 +454,7 @@ else if (isset($_GET['report']))
 
 			if (!$topic_info)
 			{
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 			}
 
 			($hook = get_hook('mi_report_pre_reports_sent')) ? eval($hook) : null;
@@ -607,7 +607,7 @@ else if (isset($_GET['subscribe']))
 
 	$topic_id = intval($_GET['subscribe']);
 	if ($topic_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.
@@ -634,7 +634,7 @@ else if (isset($_GET['subscribe']))
 
 	if (!$subject)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	$query = array(
@@ -676,7 +676,7 @@ else if (isset($_GET['unsubscribe']))
 
 	$topic_id = intval($_GET['unsubscribe']);
 	if ($topic_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.
@@ -730,7 +730,7 @@ else if (isset($_GET['forum_subscribe']))
 
 	$forum_id = intval($_GET['forum_subscribe']);
 	if ($forum_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.
@@ -757,7 +757,7 @@ else if (isset($_GET['forum_subscribe']))
 
 	if (!$forum_name)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	$query = array(
@@ -799,7 +799,7 @@ else if (isset($_GET['forum_unsubscribe']))
 
 	$forum_id = intval($_GET['forum_unsubscribe']);
 	if ($forum_id < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.
@@ -848,4 +848,4 @@ else if (isset($_GET['forum_unsubscribe']))
 
 ($hook = get_hook('mi_new_action')) ? eval($hook) : null;
 
-message($lang_common['Bad request']);
+not_found($lang_common['Bad request']);

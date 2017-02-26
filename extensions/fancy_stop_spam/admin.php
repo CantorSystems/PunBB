@@ -106,5 +106,5 @@ if ($section == 'logs') {
     ob_end_clean();
     require FORUM_ROOT.'footer.php';
 } else {
-    message($lang_common['Bad request']);
+    not_found($lang_common['Bad request']);
 }

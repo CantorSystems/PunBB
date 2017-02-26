@@ -588,11 +588,11 @@ function generate_action_search_query($action, $value, &$search_id, &$url_type, 
 
 		case 'show_subscriptions':
 			if ($forum_user['is_guest'])
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			// Check we're allowed to see the subscriptions we're trying to look at
 			if ($forum_user['g_id'] != FORUM_ADMIN && $forum_user['id'] != $value)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			$query = array(
 				'SELECT'	=> 't.id AS tid, t.poster, t.subject, t.first_post_id, t.posted, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.closed, t.sticky, t.forum_id, f.forum_name',
@@ -639,11 +639,11 @@ function generate_action_search_query($action, $value, &$search_id, &$url_type, 
 
 		case 'show_forum_subscriptions':
 			if ($forum_user['is_guest'])
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			// Check we're allowed to see the subscriptions we're trying to look at
 			if ($forum_user['g_id'] != FORUM_ADMIN && $forum_user['id'] != $value)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			$query = array(
 				'SELECT'	=> 'c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.forum_desc, f.redirect_url, f.moderators, f.num_topics, f.num_posts, f.last_post, f.last_post_id, f.last_poster',

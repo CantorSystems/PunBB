@@ -24,7 +24,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/delete.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 // Fetch some info about the post, the topic and the forum
@@ -53,7 +53,7 @@ $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 $cur_post = $forum_db->fetch_assoc($result);
 
 if (!$cur_post)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 // Sort out who the moderators are and if we are currently a moderator (or an admin)
 $mods_array = ($cur_post['moderators'] != '') ? unserialize($cur_post['moderators']) : array();

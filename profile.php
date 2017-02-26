@@ -18,7 +18,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 $section = isset($_GET['section']) ? $_GET['section'] : 'about';	// Default to section "about"
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 2)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 $errors = array();
 
@@ -52,7 +52,7 @@ $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 $user = $forum_db->fetch_assoc($result);
 
 if (!$user)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 if ($action == 'change_pass')
@@ -1014,7 +1014,7 @@ else if (isset($_POST['form_sent']))
 
 			// Validate timezone
 			if (($form['timezone'] > 14.0) || ($form['timezone'] < -12.0)) {
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 			}
 
 			$form['email_setting'] = intval($form['email_setting']);
@@ -1031,7 +1031,7 @@ else if (isset($_POST['form_sent']))
 			{
 				$form['language'] = preg_replace('#[\.\\\/]#', '', $form['language']);
 				if (!file_exists(FORUM_ROOT.'lang/'.$form['language'].'/common.php'))
-					message($lang_common['Bad request']);
+					not_found($lang_common['Bad request']);
 			}
 
 			if ($form['disp_topics'] != '' && intval($form['disp_topics']) < 3) $form['disp_topics'] = 3;
@@ -1050,7 +1050,7 @@ else if (isset($_POST['form_sent']))
 			{
 				$form['style'] = preg_replace('#[\.\\\/]#', '', $form['style']);
 				if (!file_exists(FORUM_ROOT.'style/'.$form['style'].'/'.$form['style'].'.php'))
-					message($lang_common['Bad request']);
+					not_found($lang_common['Bad request']);
 			}
 			break;
 		}
@@ -1266,7 +1266,7 @@ else if (isset($_POST['form_sent']))
 
 		// Make sure we have something to update
 		if (empty($new_values))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		// Run the update
 		$query = array(
@@ -2771,7 +2771,7 @@ if ($forum_page['has_required']): ?>
 	else if ($section == 'admin')
 	{
 		if ($forum_user['g_id'] != FORUM_ADMIN && ($forum_user['g_moderator'] != '1' || $forum_user['g_mod_ban_users'] == '0' || $forum_user['id'] == $id))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		// Setup breadcrumbs
 		$forum_page['crumbs'] = array(
@@ -2965,5 +2965,5 @@ if ($forum_page['has_required']): ?>
 
 	($hook = get_hook('pf_change_details_new_section')) ? eval($hook) : null;
 
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 }

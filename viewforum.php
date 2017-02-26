@@ -23,7 +23,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/forum.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 // Fetch some info about the forum
@@ -53,7 +53,7 @@ $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 $cur_forum = $forum_db->fetch_assoc($result);
 
 if (!$cur_forum)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 ($hook = get_hook('vf_modify_forum_info')) ? eval($hook) : null;

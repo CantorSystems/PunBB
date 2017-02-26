@@ -59,7 +59,7 @@ else if (isset($_POST['del_cat']) || isset($_POST['del_cat_comply']))
 {
 	$cat_to_delete = intval($_POST['cat_to_delete']);
 	if ($cat_to_delete < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// User pressed the cancel button
 	if (isset($_POST['del_cat_cancel']))
@@ -149,7 +149,7 @@ else if (isset($_POST['del_cat']) || isset($_POST['del_cat_comply']))
 		$cat_name = $forum_db->result($result);
 
 		if (is_null($cat_name) || $cat_name === false)
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 
 		// Setup the form

@@ -420,13 +420,13 @@ class Pun_poll {
 		if ($read_unvote_users !== FALSE)
 		{
 			if (!$forum_config['p_pun_poll_enable_read'] || ($read_unvote_users != 0 && $read_unvote_users != 1))
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 		}
 
 		if ($revote !== FALSE)
 		{
 			if (!$forum_config['p_pun_poll_enable_revote'] || ($revote != 0 && $revote != 1))
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 		}
 	}
 }

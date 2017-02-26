@@ -3483,6 +3483,13 @@ function error()
 	exit;
 }
 
+function not_found($message)
+{
+	define('FORUM_HTTP_RESPONSE_CODE_SET', 1);
+	header('HTTP/1.1 404 Not Found');
+	error($message);
+}
+
 function send_json($params)
 {
 	header('Content-type: application/json; charset=utf-8');

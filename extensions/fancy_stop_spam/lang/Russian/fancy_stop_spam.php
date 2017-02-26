@@ -24,7 +24,7 @@ $lang_fancy_stop_spam = array(
 
 	'Enable Honeypot'				=> 'Включить защиту скрытыми полями',
 	'Enable Timeout'				=> 'Включить отслеживание времени заполнения формы',
-	'Enable Timezone'				=> 'Включить проверку часового пояса (UTC-12:00)',
+	'Enable Timezone'				=> 'Включить проверку часовым поясом (UTC-12:00)',
 	'Enable Check Identical'		=> 'Проверять одинаковые сообщения',
 
 	'Enable SFS Email'				=> 'Проверять эл. почту через StopForumSpam',

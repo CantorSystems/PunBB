@@ -928,7 +928,7 @@ function pun_pm_get_page(&$page)
 			$message = pun_pm_get_message((int) $_GET['message_id'], 'outbox');
 
 			if ($message === false)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			return pun_pm_message($message, 'outbox');
 		}
@@ -943,7 +943,7 @@ function pun_pm_get_page(&$page)
 			$message = pun_pm_get_message((int) $_GET['message_id'], 'inbox');
 
 			if ($message === false)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			return pun_pm_message($message, 'inbox');
 		}

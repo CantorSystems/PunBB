@@ -25,7 +25,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $pid = isset($_GET['pid']) ? intval($_GET['pid']) : 0;
 if ($id < 1 && $pid < 1)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 
 // If a post ID is specified we determine topic ID and page number so we can redirect to the correct message
@@ -43,7 +43,7 @@ if ($pid)
 
 	if (!$topic_info)
 	{
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 	}
 
 	$id = $topic_info['topic_id'];
@@ -147,7 +147,7 @@ $cur_topic = $forum_db->fetch_assoc($result);
 
 if (!$cur_topic)
 {
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 }
 
 ($hook = get_hook('vt_modify_topic_info')) ? eval($hook) : null;

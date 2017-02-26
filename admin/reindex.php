@@ -34,7 +34,7 @@ if (isset($_GET['i_per_page']) && isset($_GET['i_start_at']))
 	$per_page = intval($_GET['i_per_page']);
 	$start_at = intval($_GET['i_start_at']);
 	if ($per_page < 1 || $start_at < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	// We validate the CSRF token. If it's set in POST and we're at this point, the token is valid.
 	// If it's in GET, we need to make sure it's valid.

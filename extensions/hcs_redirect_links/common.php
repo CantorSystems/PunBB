@@ -134,7 +134,7 @@ if ($action == 'redirect_confirm')
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		$cur_info = $forum_db->fetch_assoc($result);
 		$forum_message = $cur_info['signature'];
@@ -150,7 +150,7 @@ if ($action == 'redirect_confirm')
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		$cur_info = $forum_db->fetch_assoc($result);
 		$forum_message = $cur_info['url'];		
@@ -172,7 +172,7 @@ if ($action == 'redirect_confirm')
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		$cur_info = $forum_db->fetch_assoc($result);
 
@@ -194,7 +194,7 @@ if ($action == 'redirect_confirm')
 
 	do_redirect($matches[1], $pid,$uid);
 	
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 		
 	
 }

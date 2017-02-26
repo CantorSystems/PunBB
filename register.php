@@ -202,7 +202,7 @@ else if (isset($_POST['form_sent']))
 			{
 				$language = preg_replace('#[\.\\\/]#', '', $_POST['language']);
 				if (!file_exists(FORUM_ROOT.'lang/'.$language.'/common.php'))
-					message($lang_common['Bad request']);
+					not_found($lang_common['Bad request']);
 			}
 			else
 				$language = $forum_config['o_default_lang'];

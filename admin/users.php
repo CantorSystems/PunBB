@@ -31,7 +31,7 @@ if (isset($_GET['ip_stats']))
 {
 	$ip_stats = intval($_GET['ip_stats']);
 	if ($ip_stats < 1)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	($hook = get_hook('aus_ip_stats_selected')) ? eval($hook) : null;
 
@@ -738,7 +738,7 @@ else if (isset($_POST['change_group']) || isset($_POST['change_group_comply']) |
 		$group_is_mod = $forum_db->result($result);
 
 		if ($move_to_group == FORUM_GUEST || (is_null($group_is_mod) || $group_is_mod === false))
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		// Move users
 		$query = array(
@@ -852,10 +852,10 @@ else if (isset($_GET['find_user']))
 	$order_by = isset($_GET['order_by']) ? forum_trim($_GET['order_by']) : null;
 	$direction = isset($_GET['direction']) ? forum_trim($_GET['direction']) : null;
 	if ($order_by === null || $direction === null)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	if (!in_array($order_by, array('username', 'email', 'num_posts', 'num_posts', 'registered')) || !in_array($direction, array('ASC', 'DESC')))
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 	($hook = get_hook('aus_find_user_selected')) ? eval($hook) : null;
 

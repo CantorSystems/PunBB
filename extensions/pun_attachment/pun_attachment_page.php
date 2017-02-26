@@ -53,7 +53,7 @@ if (isset($_GET['id']))
 			$pun_attach_filename = $forum_db->fetch_assoc($result);
 
 			if (!$pun_attach_filename)
-				message($lang_common['Bad request']);
+				not_found($lang_common['Bad request']);
 
 			preg_match('/\.[0-9a-zA-z]{1,}$/', $pun_attach_filename['filename'], $pun_attach_filename_ext);
 
@@ -81,7 +81,7 @@ if (isset($_GET['id']))
 		$del_attach_info = $forum_db->fetch_assoc($attach_result);
 
 		if (!$del_attach_info)
-			message($lang_common['Bad request']);
+			not_found($lang_common['Bad request']);
 
 		unlink(FORUM_ROOT.$forum_config['attach_basefolder'].$del_attach_info['file_path']);
 
@@ -158,7 +158,7 @@ if (isset($_GET['id']))
 	$pun_current_attach = $forum_db->fetch_assoc($result);
 
 	if (!$pun_current_attach)
-		message($lang_common['Bad request']);
+		not_found($lang_common['Bad request']);
 
 
 	$pun_attach_frm_buttons = array();

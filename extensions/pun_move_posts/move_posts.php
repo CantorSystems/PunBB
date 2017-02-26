@@ -11,7 +11,7 @@
 $tid = intval($_GET['tid']);
 $fid = intval($_GET['fid']);
 if ($tid < 1)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 // Fetch some info about the topic
 $query = array(
@@ -26,7 +26,7 @@ $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 $cur_topic = $forum_db->fetch_assoc($result);
 
 if (!$cur_topic)
-	message($lang_common['Bad request']);
+	not_found($lang_common['Bad request']);
 
 $posts = isset($_POST['posts']) && !empty($_POST['posts']) ? $_POST['posts'] : array();
 $posts = array_map('intval', (is_array($posts) ? $posts : explode(',', $posts)));
