@@ -590,13 +590,46 @@ function handle_url_tag($url, $link = '', $bbcode = false)
 	if ($return !== null)
 		return $return;
 
-	$full_url = str_replace(array(' ', '\'', '`', '"'), array('%20', '', '', ''), $url);
-	if (strpos($url, 'www.') === 0)			// If it starts with www, we add http://
-		$full_url = 'http://'.$full_url;
-	else if (strpos($url, 'ftp.') === 0)	// Else if it starts with ftp, we add ftp://
-		$full_url = 'ftp://'.$full_url;
-	else if (!preg_match('#^([a-z0-9]{3,6})://#', $url))	// Else if it doesn't start with abcdef://, we add http://
-		$full_url = 'http://'.$full_url;
+	if (preg_match('%^[#/]?\d+$%', $url)) // relative links [url=2], [url=#3] or [url=/3]
+	{
+		global $forum_url;
+		if ($url[0] === '/')
+		{
+			if ($link == '')
+				$link = substr($url, 1);
+			$url = forum_link($forum_url['forum'], substr($url, 1));
+		}
+		elseif ($url[0] === '#')
+		{
+			if ($link == '')
+				$link = substr($url, 1);
+			$url = forum_link($forum_url['post'], substr($url, 1));
+		}
+		else
+		{
+			if ($link == '')
+				$link = $url;
+			$url = forum_link($forum_url['topic'], $url);
+		}
+		return ($bbcode) ? '[url='.$url.']'.$link.'[/url]' : '<a href="'.$url.'">'.$link.'</a>';
+	}
+
+	if ($url[0] === '/')
+	{
+		$full_url = $url;
+		if ($link == '')
+			$link = substr($url, 1);
+	}
+	else
+	{
+		$full_url = str_replace(array(' ', '\'', '`', '"'), array('%20', '', '', ''), $url);
+		if (strpos($url, 'www.') === 0)			// If it starts with www, we add http://
+			$full_url = 'http://'.$full_url;
+		else if (strpos($url, 'ftp.') === 0)	// Else if it starts with ftp, we add ftp://
+			$full_url = 'ftp://'.$full_url;
+		else if (!preg_match('#^([a-z0-9]{3,6})://#', $url))	// Else if it doesn't start with abcdef://, we add http://
+			$full_url = 'http://'.$full_url;
+	}
 
 	if (defined('FORUM_SUPPORT_PCRE_UNICODE') && defined('FORUM_ENABLE_IDNA'))
 	{
@@ -692,7 +725,7 @@ function handle_img_tag($url, $is_signature = false, $alt = null)
 		return $return;
 
 	if ($alt === null)
-		$alt = $url;
+        $alt = basename($url);
 
 	$img_tag = '<a href="'.$url.'">&lt;'.$lang_common['Image link'].'&gt;</a>';
 
@@ -779,17 +812,17 @@ $text);
 
 	if (($is_signature && $forum_config['p_sig_img_tag'] == '1') || (!$is_signature && $forum_config['p_message_img_tag'] == '1'))
 	{
-		$pattern[] = '#\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
-		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
+		$pattern[] = '#\[img\]((ht|f)tps?:/)?/([^\s<"]*?)\[/img\]#';
+		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?:/)?/([^\s<"]*?)\[/img\]#';
 		if ($is_signature)
 		{
-			$replace[] = '".handle_img_tag($matches[1].$matches[3], true)."';
-			$replace[] = '".handle_img_tag($matches[2].$matches[4], true, $matches[1])."';
+			$replace[] = '".handle_img_tag($matches[1].\'/\'.$matches[3], true)."';
+			$replace[] = '".handle_img_tag($matches[2].\'/\'.$matches[4], true, $matches[1])."';
 		}
 		else
 		{
-			$replace[] = '".handle_img_tag($matches[1].$matches[3], false)."';
-			$replace[] = '".handle_img_tag($matches[2].$matches[4], false, $matches[1])."';
+			$replace[] = '".handle_img_tag($matches[1].\'/\'.$matches[3], false)."';
+			$replace[] = '".handle_img_tag($matches[2].\'/\'.$matches[4], false, $matches[1])."';
 		}
 	}
 
