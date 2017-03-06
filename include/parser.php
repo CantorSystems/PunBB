@@ -590,7 +590,7 @@ function handle_url_tag($url, $link = '', $bbcode = false)
 	if ($return !== null)
 		return $return;
 
-	if (preg_match('%^[#/]?\d+$%', $url)) // relative links [url=2], [url=#3] or [url=/3]
+	if (preg_match('%^[#/]?\d+(&.*)?$%', $url)) // relative links [url=2], [url=#3] or [url=/3]
 	{
 		global $forum_url;
 		if ($url[0] === '/')
