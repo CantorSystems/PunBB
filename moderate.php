@@ -296,7 +296,7 @@ if (isset($_GET['tid']))
 
 			// Get data from the new first post
 			$query = array(
-				'SELECT'	=> 'p.id, p.poster, p.posted',
+				'SELECT'	=> 'p.*',
 				'FROM'		=> 'posts AS p',
 				'WHERE'		=> 'p.id = '.min($posts)
 			);
@@ -304,6 +304,16 @@ if (isset($_GET['tid']))
 			($hook = get_hook('mr_confirm_split_posts_qr_get_first_post_data')) ? eval($hook) : null;
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			$first_post_data = $forum_db->fetch_assoc($result);
+
+			if (isset($_POST['dup_first']))
+			{
+				$copy = $first_post_data;
+				unset($copy['id']);
+				$keys = implode(', ', array_keys($copy));
+				$sql = 'INSERT INTO '.$forum_db->prefix.'posts ('.$keys.') '.
+					'SELECT '.$keys.' FROM '.$forum_db->prefix.'posts WHERE id = '.$first_post_data['id'];
+				$forum_db->query($sql) or error(__FILE__, __LINE__);
+			}
 
 			// Create the new topic
 			$query = array(
@@ -382,6 +392,10 @@ if (isset($_GET['tid']))
 					<div class="sf-box text required">
 						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['New subject'] ?></span></label><br />
 						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="new_subject" size="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" maxlength="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" required /></span>
+					</div>
+					<div class="sf-box checkbox">
+						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="dup_first" value="1" /></span>
+						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['Duplicate first post'] ?></span> <?php echo $lang_misc['Duplicate first message'] ?>.</label>
 					</div>
 <?php ($hook = get_hook('mr_confirm_split_posts_pre_confirm_checkbox')) ? eval($hook) : null; ?>
 					<div class="sf-box checkbox">

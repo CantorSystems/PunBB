@@ -72,7 +72,7 @@ $lang_admin_ext = array(
 'Download latest version'		=>	'Download latest version',
 'Version dependency error'      =>  'Extension "%s" must be version %s or higher',
 'Install ext errors'            =>  '<strong>Warning!</strong> The following errors must be corrected before extension can be installed:',
-'The minimum required version of PHP'   => 'The minimum required version of PHP – ',
-'The maximum required version of PHP'   => 'The maximum required version of PHP – ',
-'PHP extension is required'             => 'PHP extension is required – ',
+'The minimum required version of PHP'   => 'The minimum required version of PHP â€“ ',
+'The maximum required version of PHP'   => 'The maximum required version of PHP â€“ ',
+'PHP extension is required'             => 'PHP extension is required â€“ ',
 );

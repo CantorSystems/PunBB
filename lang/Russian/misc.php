@@ -84,7 +84,7 @@ $lang_misc = array(
 // Moderate topic
 'Posts' 					=> 'Сообщения',
 'Delete posts'  			=> 'Удалить выбранные сообщения',
-'Split posts'   			=> 'Разделить выбранные сообщения',
+'Split posts'   			=> 'Отделить выбранные сообщения',
 'Delete whole topic'		=> 'Удалить всю тему',
 'Moderate topic head'   	=> 'Модерирование темы «%s»',
 'New subject'   			=> 'Новый заголовок темы:',
@@ -94,6 +94,8 @@ $lang_misc = array(
 'Confirm topic split'   	=> 'Подтверждение переноса выбранных сообщений в новую тему',
 'Confirm topic merge'   	=> 'Подтверждение объединения выбранных тем в одну',
 'Confirm post split'		=> 'Подтверждение разделения сообщений',
+'Duplicate first post'		=> 'Копировать первое сообщение',
+'Duplicate first message'	=> 'Оставить копию первого сообщения в исходной теме',
 'Delete posts redirect' 	=> 'Сообщения удалены.',
 'Split posts redirect'  	=> 'Сообщения выделены в новую тему.',
 'No posts selected' 		=> 'Нужно выбрать хотя бы одно сообщение.',

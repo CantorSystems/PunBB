@@ -235,7 +235,7 @@ function pun_tags_add_existing_tag($tag_id, $topic_id)
 
 function compare_tags($tag_info1, $tag_info2)
 {
-	return strcmp($tag_info1['tag'], $tag_info2['tag']);
+	return strcasecmp($tag_info1['tag'], $tag_info2['tag']);
 }
 
 function array_tags_slice($tags)
@@ -272,7 +272,7 @@ function tag_cache_index($edited_tag)
 
 	foreach ($pun_tags['index'] as $index_tag_id => $index_tag_value)
 	{
-		if (strcmp($index_tag_value, $edited_tag) == 0)
+		if (strcasecmp($index_tag_value, $edited_tag) == 0)
 			return $index_tag_id;
 	}
 	return FALSE;
