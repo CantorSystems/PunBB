@@ -305,14 +305,15 @@ if (isset($_GET['tid']))
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			$first_post_data = $forum_db->fetch_assoc($result);
 
-			if (isset($_POST['dup_first']))
+			if (isset($_POST['duplicate']))
 			{
 				$copy = $first_post_data;
 				unset($copy['id']);
-				$keys = implode(', ', array_keys($copy));
+				$keys = implode(',', array_keys($copy));
 				$sql = 'INSERT INTO '.$forum_db->prefix.'posts ('.$keys.') '.
 					'SELECT '.$keys.' FROM '.$forum_db->prefix.'posts WHERE id = '.$first_post_data['id'];
 				$forum_db->query($sql) or error(__FILE__, __LINE__);
+				$first_post_data['id'] = $forum_db->insert_id();
 			}
 
 			// Create the new topic
@@ -326,13 +327,35 @@ if (isset($_GET['tid']))
 			$forum_db->query_build($query) or error(__FILE__, __LINE__);
 			$new_tid = $forum_db->insert_id();
 
-			// Move the posts to the new topic
-			$query = array(
-				'UPDATE'	=> 'posts',
-				'SET'		=> 'topic_id='.$new_tid,
-				'WHERE'		=> 'id IN('.implode(',', $posts).')'
-			);
+			// Copy/move the posts to the new topic
+			if (isset($_POST['duplicate']))
+			{
+				$query = array(
+					'UPDATE'	=> 'posts',
+					'SET'		=> 'topic_id='.$new_tid,
+					'WHERE'		=> 'id='.$first_post_data['id']
+				);
+				unset($first_post_data['id']);
+				unset($first_post_data['topic_id']);
 
+				$index = array_search(min($posts), $posts);
+ 				unset($posts[$index]);
+				if (count($posts) !== 0)
+				{
+					$keys = implode(',', array_keys($first_post_data));
+					$sql = 'INSERT INTO '.$forum_db->prefix.'posts ('.$keys.',topic_id) '.
+						'SELECT '.$keys.','.$new_tid.' FROM '.$forum_db->prefix.'posts WHERE id IN('.implode(',', $posts).')';
+					$forum_db->query($sql) or error(__FILE__, __LINE__);
+				}
+				else
+					array_push($posts, '0'); // for hooks
+			}
+			else
+				$query = array(
+					'UPDATE'	=> 'posts',
+					'SET'		=> 'topic_id='.$new_tid,
+					'WHERE'		=> 'id IN('.implode(',', $posts).')'
+				);
 			($hook = get_hook('mr_confirm_split_posts_qr_move_posts')) ? eval($hook) : null;
 			$forum_db->query_build($query) or error(__FILE__, __LINE__);
 
@@ -394,8 +417,8 @@ if (isset($_GET['tid']))
 						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="new_subject" size="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" maxlength="<?php echo FORUM_SUBJECT_MAXIMUM_LENGTH ?>" required /></span>
 					</div>
 					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="dup_first" value="1" /></span>
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['Duplicate first post'] ?></span> <?php echo $lang_misc['Duplicate first message'] ?>.</label>
+						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="duplicate" value="1" /></span>
+						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_misc['Duplicate posts'] ?></span> <?php echo $lang_misc['Duplicate posts message'] ?>.</label>
 					</div>
 <?php ($hook = get_hook('mr_confirm_split_posts_pre_confirm_checkbox')) ? eval($hook) : null; ?>
 					<div class="sf-box checkbox">
