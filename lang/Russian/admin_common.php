@@ -54,7 +54,7 @@ $lang_admin_common = array(
 'Bans'							=> 'Блокировки',
 
 // Management Submenu
-'Reports'						=> 'Обращения',
+'Reports'						=> 'Жалобы',
 'Prune topics'					=> 'Удаление тем',
 'Maintenance mode'				=> 'Режим профилактики',
 'Rebuild index'					=> 'Пересоздание поискового индекса',
