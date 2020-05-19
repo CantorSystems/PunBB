@@ -1,0 +1,11 @@
+.htaccess
+log.txt
+
+*.7z
+*.min.css
+*.tar
+*.tar.gz
+*.zip
+
+/sitemap.xml
+/cache/*.*
